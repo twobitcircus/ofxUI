@@ -63,6 +63,7 @@ void ofxUISlider_<T>::init(string _name, T _min, T _max, T *_value, float w, flo
     setKind();
     
     draw_fill = true;
+    bFlip = false;
     
     value = *_value;                                               //the widget's value
     if(useReference)
@@ -219,6 +220,11 @@ void ofxUISlider_<T>::setDrawPaddingOutline(bool _draw_padded_rect_outline)
 }
 
 template<typename T>
+void ofxUISlider_<T>::setFlip(bool _bFlip) {
+  bFlip = _bFlip;
+}
+
+template<typename T>
 void ofxUISlider_<T>::drawBack()
 {
     if(draw_back)
@@ -260,11 +266,22 @@ void ofxUISlider_<T>::drawFill()
         ofxUISetColor(color_fill);
         if(orientation == OFX_UI_ORIENTATION_HORIZONTAL)
         {
-            ofxUIDrawRect(rect->getX(), rect->getY(), rect->getWidth()*MIN(MAX(value, 0.0), 1.0), rect->getHeight());
+            if (!bFlip) {
+                ofxUIDrawRect(rect->getX(), rect->getY(), rect->getWidth()*MIN(MAX(value, 0.0), 1.0), rect->getHeight());
+            } else {
+                ofxUIDrawRect(rect->getX()+rect->getWidth()*MIN(MAX(1.0-value, 0.0), 1.0), rect->getY(), rect->getWidth()*MIN(MAX(value, 0.0), 1.0), rect->getHeight());
+            }
         }
         else
         {
-            ofxUIDrawRect(rect->getX(), rect->getY()+rect->getHeight(), rect->getWidth(), -rect->getHeight()*MIN(MAX(value, 0.0), 1.0));
+            if (!bFlip)
+            {
+                ofxUIDrawRect(rect->getX(), rect->getY()+rect->getHeight(), rect->getWidth(), -rect->getHeight()*MIN(MAX(value, 0.0), 1.0));
+            }
+            else
+            {
+                ofxUIDrawRect(rect->getX(), rect->getY(), rect->getWidth(), rect->getHeight()*MIN(MAX(value, 0.0), 1.0));
+            }
         }
     }
 }
@@ -278,15 +295,36 @@ void ofxUISlider_<T>::drawFillHighlight()
         ofxUISetColor(color_fill_highlight);
         if(orientation == OFX_UI_ORIENTATION_HORIZONTAL)
         {
-            ofxUIDrawRect(rect->getX(), rect->getY(), rect->getWidth()*MIN(MAX(value, 0.0), 1.0), rect->getHeight());
+            if (!bFlip)
+            {
+                ofxUIDrawRect(rect->getX(), rect->getY(), rect->getWidth()*MIN(MAX(value, 0.0), 1.0), rect->getHeight());
+            }
+            else
+            {
+                ofxUIDrawRect(rect->getX()+rect->getWidth()*MIN(MAX(1.0-value, 0.0), 1.0), rect->getY(), rect->getWidth()*MIN(MAX(value, 0.0), 1.0), rect->getHeight());
+            }
         }
         else
         {
-            ofxUIDrawRect(rect->getX(), rect->getY()+rect->getHeight(), rect->getWidth(), -rect->getHeight()*MIN(MAX(value, 0.0), 1.0));
+            if (!bFlip)
+            {
+                ofxUIDrawRect(rect->getX(), rect->getY()+rect->getHeight(), rect->getWidth(), -rect->getHeight()*MIN(MAX(value, 0.0), 1.0));
+            }
+            else
+            {
+                ofxUIDrawRect(rect->getX(), rect->getY(), rect->getWidth(), rect->getHeight()*MIN(MAX(value, 0.0), 1.0));
+            }
         }
         if(kind == OFX_UI_WIDGET_SLIDER_V)
         {
-            label->drawString(rect->getX()+rect->getWidth()+padding, label->getRect()->getHeight()/2.0+rect->getY()+rect->getHeight()-rect->getHeight()*MIN(MAX(value, 0.0), 1.0), valueString);
+            if (!bFlip)
+            {
+                label->drawString(rect->getX()+rect->getWidth()+padding, label->getRect()->getHeight()/2.0+rect->getY()+rect->getHeight()-rect->getHeight()*MIN(MAX(value, 0.0), 1.0), valueString);
+            }
+            else
+            {
+                label->drawString(rect->getX()+rect->getWidth()+padding, label->getRect()->getHeight()/2.0+rect->getY()+rect->getHeight()*MIN(MAX(value, 0.0), 1.0), valueString);
+            }
         }
     }
 }
@@ -451,6 +489,10 @@ void ofxUISlider_<T>::input(float x, float y)
     }
     
     value = MIN(1.0, MAX(0.0, value));
+    if (bFlip)
+    {
+      value = 1.0-value;
+    }
     updateValueRef();
     updateLabel();
 }

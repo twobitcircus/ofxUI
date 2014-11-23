@@ -36,6 +36,7 @@ public:
     ~ofxUISlider_();
     void setKind();
     void setOrientation(float w, float h);
+    void setFlip(bool _flip);
     virtual void init(string _name, T _min, T _max, T *_value, float w, float h, float x, float y);
     
     virtual void update();
@@ -104,6 +105,7 @@ protected:
     double stickyValue;
     bool bRoundedToNearestInt;
     bool bClampValue;
+    bool bFlip;
     double value, increment;
     T *valueRef;
     bool useReference;
