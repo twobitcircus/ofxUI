@@ -94,6 +94,9 @@ void ofxUI2DPad::init(string _name, ofxUIVec3f _rangeX, ofxUIVec3f _rangeY, ofxU
     float horizontalRange = abs(rangeX.x - rangeX.y);
     float verticalRange = abs(rangeY.x - rangeY.y);
     increment = MIN(horizontalRange, verticalRange) / 10.0;
+
+    bFlipX = false;
+    bFlipY = false;
 }
 
 void ofxUI2DPad::update()
@@ -119,33 +122,44 @@ void ofxUI2DPad::setDrawPaddingOutline(bool _draw_padded_rect_outline)
 
 void ofxUI2DPad::drawFill()
 {
+    float draw_x = value.x;
+    float draw_y = value.y;
+    if (bFlipX) draw_x = 1.0 - draw_x;
+    if (bFlipY) draw_y = 1.0 - draw_y;
+
     if(draw_fill)
     {
         ofxUIFill();
         ofxUISetColor(color_fill);
         ofxUISetRectMode(OFX_UI_RECTMODE_CENTER);
-        ofxUIDrawRect(rect->getX()+value.x*rect->getWidth(), rect->getY()+value.y*rect->getHeight(), OFX_UI_GLOBAL_WIDGET_SPACING, OFX_UI_GLOBAL_WIDGET_SPACING);
+
+        ofxUIDrawRect(rect->getX()+draw_x*rect->getWidth(), rect->getY()+draw_y*rect->getHeight(), OFX_UI_GLOBAL_WIDGET_SPACING, OFX_UI_GLOBAL_WIDGET_SPACING);
         ofxUISetRectMode(OFX_UI_RECTMODE_CORNER);
         
-        ofxUIDrawLine(rect->getX()+value.x*rect->getWidth(),  rect->getY(), rect->getX()+value.x*rect->getWidth(),  rect->getY()+rect->getHeight());
-        ofxUIDrawLine(rect->getX(),  rect->getY()+value.y*rect->getHeight(), rect->getX()+rect->getWidth(),  rect->getY()+value.y*rect->getHeight());
+        ofxUIDrawLine(rect->getX()+draw_x*rect->getWidth(),  rect->getY(), rect->getX()+draw_x*rect->getWidth(),  rect->getY()+rect->getHeight());
+        ofxUIDrawLine(rect->getX(),  rect->getY()+draw_y*rect->getHeight(), rect->getX()+rect->getWidth(),  rect->getY()+draw_y*rect->getHeight());
     }
 }
 
 void ofxUI2DPad::drawFillHighlight()
 {
+    float draw_x = value.x;
+    float draw_y = value.y;
+    if (bFlipX) draw_x = 1.0 - draw_x;
+    if (bFlipY) draw_y = 1.0 - draw_y;
+
     if(draw_fill_highlight)
     {
         ofxUIFill();
         ofxUISetColor(color_fill_highlight);
         ofxUISetRectMode(OFX_UI_RECTMODE_CENTER);
-        ofxUIDrawRect(rect->getX()+value.x*rect->getWidth(), rect->getY()+value.y*rect->getHeight(), OFX_UI_GLOBAL_WIDGET_SPACING, OFX_UI_GLOBAL_WIDGET_SPACING);
+        ofxUIDrawRect(rect->getX()+draw_x*rect->getWidth(), rect->getY()+draw_y*rect->getHeight(), OFX_UI_GLOBAL_WIDGET_SPACING, OFX_UI_GLOBAL_WIDGET_SPACING);
         ofxUISetRectMode(OFX_UI_RECTMODE_CORNER);
         
-        ofxUIDrawLine(rect->getX()+value.x*rect->getWidth(),  rect->getY(), rect->getX()+value.x*rect->getWidth(),  rect->getY()+rect->getHeight());
-        ofxUIDrawLine(rect->getX(),  rect->getY()+value.y*rect->getHeight(), rect->getX()+rect->getWidth(),  rect->getY()+value.y*rect->getHeight());
+        ofxUIDrawLine(rect->getX()+draw_x*rect->getWidth(),  rect->getY(), rect->getX()+draw_x*rect->getWidth(),  rect->getY()+rect->getHeight());
+        ofxUIDrawLine(rect->getX(),  rect->getY()+draw_y*rect->getHeight(), rect->getX()+rect->getWidth(),  rect->getY()+draw_y*rect->getHeight());
         
-        label->drawString(rect->getX()+value.x*rect->getWidth()+OFX_UI_GLOBAL_WIDGET_SPACING, rect->getY()+value.y*rect->getHeight(), "(" +ofxUIToString(getScaledValue().x,labelPrecision) + ", " + ofxUIToString(getScaledValue().y,labelPrecision)+")");
+        label->drawString(rect->getX()+draw_x*rect->getWidth()+OFX_UI_GLOBAL_WIDGET_SPACING, rect->getY()+draw_y*rect->getHeight(), "(" +ofxUIToString(getScaledValue().x,labelPrecision) + ", " + ofxUIToString(getScaledValue().y,labelPrecision)+")");
     }
 }
 
@@ -157,6 +171,11 @@ float ofxUI2DPad::getIncrement()
 void ofxUI2DPad::setIncrement(float _increment)
 {
     increment = _increment;
+}
+
+void ofxUI2DPad::setFlip(bool _bFlipX, bool _bFlipY) {
+  bFlipX = _bFlipX;
+  bFlipY = _bFlipY;
 }
 
 void ofxUI2DPad::mouseMoved(int x, int y )
@@ -292,6 +311,9 @@ void ofxUI2DPad::input(float x, float y)
 {
     value.x = MIN(1.0, MAX(0.0, rect->percentInside(x, y).x));
     value.y = MIN(1.0, MAX(0.0, rect->percentInside(x, y).y));
+
+    if (bFlipX) value.x = 1.0 - value.x;
+    if (bFlipY) value.y = 1.0 - value.y;
 
     updateValueRef();
     updateLabel();

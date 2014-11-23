@@ -53,6 +53,7 @@ public:
 	ofxUIVec3f getValue();
 	ofxUIVec3f getPercentValue();
 	ofxUIVec3f getScaledValue();
+    void setFlip(bool _bFlipX, bool _bFlipY);
     bool isDraggable();
     void setLabelPrecision(int _precision);
     bool hasState(){ return true; };
@@ -68,4 +69,5 @@ protected:
     int labelPrecision;     
     bool useReference; 
     ofxUIVec3f rangeX, rangeY;
+    bool bFlipX, bFlipY;
 }; 
